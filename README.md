@@ -16,4 +16,4 @@ bin/downsample.sh
 
 ## Lab
 
-WIP Instructions found [here]('instructions.md)
+WIP Instructions found [here](instructions.md)
