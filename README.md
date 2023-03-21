@@ -13,3 +13,7 @@ Downsample data to reasonable coverage (using BCCDC's `downsample_amplicons.py` 
 ```
 bin/downsample.sh
 ```
+
+## Lab
+
+WIP Instructions found [here]('instructions.md)
