@@ -49,7 +49,29 @@ To download our seqeucning data, we'll use a provided script with our list of ac
 
 If you run `ls` you should now be able to see a directory has been created called `raw_data`. If you run `ls raw_data`, you should be able to see a series of FASTQ files, including "\_1" and matching "\_2" files.
 
+Navigate to the `covid-19-signal` directory where our results will be located (subject to change given filesystem...) and activate the conda environment required to run both `SIGNAL` and `ncov-tools`:
+
+```
+cd ../covid-19-signal
+
+conda activate signalcovtools
+```
+
+In order to run SIGNAL, we first need to prepare two files: a configuration file, where all of our assembly parameters will be assigned, and a sample table, which will list the indivdual samples and the location of corresponding R1 and R2 FASTQs. Remember that our sequencing data is located one directory level up (i.e., `../Module4/raw_data`). Generating the required files can all be done using doing the following:
+
+```
+python signalexe.py --directory ../Module4/raw_data --config-only
+```
+
+If you run `ls` you should see `raw_data_config.yaml` and `raw_data_sample_table.csv`.
+
 ## Reference-based assembly using SIGNAL
+
+Using our configuatrion file as input, we can begin our assembly of SARS-CoV-2 sequencing reads. Run the following:
+
+```
+python signalexe.py --configfile raw_data_config.yaml --cores 4 all
+```
 
 We can now start assessing the quality of our assembly. We typically measure the quality of an assembly using three factors:
 
