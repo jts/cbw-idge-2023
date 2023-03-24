@@ -4,7 +4,7 @@ title: CBW Infectious Disease Epidemiology 2023
 header1: Workshop Pages for Students
 header2: Informatics for High-throughput Sequencing Data Analysis 2019 Module 6 Lab
 home: https://bioinformaticsdotca.github.io/
-description: CBW IDE Module 3 - Virus Sequencing
+description: CBW IDE 2023 Module 3 - Virus Sequencing
 author: Jared Simpson
 modified: March 21, 2023
 ---
@@ -44,10 +44,18 @@ more ../etc/accessions.txt
 To download our seqeucning data, we'll use a provided script with our list of accession IDs as input:
 
 ```
-../bin/get_raw_data.sh ../etc/accessions.txt
+bash ../bin/get_raw_data.sh ../etc/accessions.txt
 ```
 
-If you run `ls` you should now be able to see a directory has been created called `raw_data`. If you run `ls raw_data`, you should be able to see a series of FASTQ files, including "\_1" and matching "\_2" files.
+If you run `ls` you should now be able to see a directory has been created called `raw_data`. If you run `ls raw_data`, you should be able to see a series of FASTQ files, including "R1" and matching "R2" files.
+
+We are going to add a step to downsample our reads prior to running through the assembly pipeline. This will results in fewer overall reads provided as input; however, the reads put forward will be sufficient for our analysis. This assumes that the `covid-19-signal` directory is located one level above, where we first started this lab practical.
+
+```
+bash ../bin/downsample.sh -a ../etc/accessions.txt -r ../covid-19-signal
+```
+
+This script will take our list of accessions (-a) and the location of the SIGNAL repository (-r) and produce another directory called `raw_reads_downsampled`, which you can verify with `ls`. Also, if you run `ls raw_reads_downsamples`, you should be able to see a series of FASTQ files, including "R1" and matching "R2" files.
 
 Navigate to the `covid-19-signal` directory where our results will be located (subject to change given filesystem...) and activate the conda environment required to run both `SIGNAL` and `ncov-tools`:
 
@@ -70,7 +78,7 @@ If you run `ls` you should see `raw_data_config.yaml` and `raw_data_sample_table
 Using our configuatrion file as input, we can begin our assembly of SARS-CoV-2 sequencing reads. Run the following:
 
 ```
-python signalexe.py --configfile raw_data_config.yaml --cores 4 all
+python signalexe.py --configfile raw_data_config.yaml --cores 4 all postprocess
 ```
 
 We can now start assessing the quality of our assembly. We typically measure the quality of an assembly using three factors:
