@@ -4,7 +4,7 @@ title: CBW Infectious Disease Epidemiology 2023
 header1: Workshop Pages for Students
 header2: Informatics for High-throughput Sequencing Data Analysis 2019 Module 6 Lab
 home: https://bioinformaticsdotca.github.io/
-description: CBW IDE Module 3 - Virus Sequencing
+description: CBW IDE 2023 Module 3 - Virus Sequencing
 author: Jared Simpson
 modified: March 21, 2023
 ---
@@ -28,57 +28,76 @@ In this lab we will use subset of data from the COVID-19 Genomics UK COnsortium 
 
 ## Data Download and Preparation
 
-First, lets create and move to a directory that we'll use to work on our assemblies:
+First, lets create and move to a directory that we'll use to organize our raw data:
 
 ```
 mkdir -p Module4
 cd Module4
 ```
 
-To view the list of accessions that will be downloaded, you can view the following file (found within `etc/accessions.txt`):
+From within your `Module4` directory, you can view the list of accessions that will be downloaded, you can view the following file (found within `etc/accessions.txt`):
 
 ```
 more ../etc/accessions.txt
 ```
 
+Note that the `..` means to go one directory above, taking us back to our starting position. You can also use `less` to view the file and use the space bar to scroll down, but use the `q` key to exit the program when you cannot scroll any further.
+
 To download our seqeucning data, we'll use a provided script with our list of accession IDs as input:
 
 ```
-../bin/get_raw_data.sh ../etc/accessions.txt
+bash ../bin/get_raw_data.sh ../etc/accessions.txt
 ```
 
-If you run `ls` you should now be able to see a directory has been created called `raw_data`. If you run `ls raw_data`, you should be able to see a series of FASTQ files, including "\_1" and matching "\_2" files.
+If you run `ls` you should now be able to see a directory has been created called `raw_data`. If you run `ls raw_data` you should be able to see a series of FASTQ files, including "R1" and matching "R2" files.
+
+We are going to add a step to downsample our reads prior to running through the assembly pipeline. This will results in fewer overall reads provided as input; however, the reads put forward will be sufficient for our analysis. This assumes that the `covid-19-signal` directory is located one level above, where we first started this lab practical.
+
+```
+bash ../bin/downsample.sh -a ../etc/accessions.txt -r ../covid-19-signal
+```
+
+This script will take our list of accessions (-a) and the location of the SIGNAL repository (-r) and produce another directory called `raw_reads_downsampled`, which you can verify with `ls`. Also, if you run `ls raw_reads_downsampled`, you should be able to see a series of FASTQ files, including "R1" and matching "R2" files.
 
 Navigate to the `covid-19-signal` directory where our results will be located (subject to change given filesystem...) and activate the conda environment required to run both `SIGNAL` and `ncov-tools`:
 
 ```
 cd ../covid-19-signal
-
 conda activate signalcovtools
 ```
 
-In order to run SIGNAL, we first need to prepare two files: a configuration file, where all of our assembly parameters will be assigned, and a sample table, which will list the indivdual samples and the location of corresponding R1 and R2 FASTQs. Remember that our sequencing data is located one directory level up (i.e., `../Module4/raw_data`). Generating the required files can all be done using doing the following:
+In order to run SIGNAL, we first need to prepare two files: a configuration file, where all of our assembly parameters will be assigned, and a sample table, which will list the indivdual samples and the location of corresponding R1 and R2 FASTQs. Remember that our sequencing data is located one directory level up (i.e., `../Module4/raw_reads_downsampled`). Generating the required files can all be done using doing the following:
 
 ```
-python signalexe.py --directory ../Module4/raw_data --config-only
+python signalexe.py --directory ../Module4/raw_reads_downsampled --config-only
 ```
 
-If you run `ls` you should see `raw_data_config.yaml` and `raw_data_sample_table.csv`.
+If you run `ls` you should see `raw_reads_downsampled_config.yaml` and `raw_reads_downsamples_sample_table.csv` files have been created. You can use `more` or `less` to examine the input files.
+
+(Need confirmation of `data` directory for SIGNAL to work)
 
 ## Reference-based assembly using SIGNAL
 
-Using our configuatrion file as input, we can begin our assembly of SARS-CoV-2 sequencing reads. Run the following:
+Using our configuatrion file as input, we can begin our assembly of SARS-CoV-2 sequencing reads. Run the following (`--data` can be used to specify the location of the data dependencies that SIGNAL uses):
 
 ```
-python signalexe.py --configfile raw_data_config.yaml --cores 4 all
+python signalexe.py --configfile raw_reads_downsampled_config.yaml --cores 4 all postprocess
 ```
 
-We can now start assessing the quality of our assembly. We typically measure the quality of an assembly using three factors:
+We can now start assessing the quality of our assembly. We typically measure the quality of an assembly using a few factors:
 
-- Contiguity: Long contigs are better than short contigs as long contigs give more information about the structure of the genome (for example, the order of genes)
-- Completeness: Most of the genome should be assembled into contigs with few regions missing from the assembly (remember for this exercise we are only assembling one megabase of the genome, not the entire genome)
-- Accuracy: The assembly should have few large-scale _misassemblies_ and _consensus errors_ (mismatches or insertions/deletions)
+- Depth of coverage: The more reads collaborating the base call across the SARS-CoV-2 genome, the more confidence we have in identifying the variant should the base call differ from the reference genmome.
+- Completeness: Most of the genome should be assembled with a large proportion of reads having covered the span of the SARS-CoV-2 genome
+- Accuracy: The assembly should have few failing QC metrics including those for insertions/deletions. Given iVar and Freebayes tools are used for reference assembly and variant calling, we can observe differences between the two methods
 
 ## Additional quality control and assessments using ncov-tools
 
+Similarly to how our configuatrion file was used as input, we can similarly run `ncov-tools` through SIGNAL. Run the following:
+
+```
+python signalexe.py --configfile raw_reads_downsampled_config.yaml --cores 4 ncov_tools
+```
+
 ## Interpretation of the data
+
+TBD
