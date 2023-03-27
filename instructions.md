@@ -78,17 +78,17 @@ If you run `ls` you should see `raw_reads_downsampled_config.yaml` and `raw_read
 
 ## Reference-based assembly using SIGNAL
 
-Using our configuatrion file as input, we can begin our assembly of SARS-CoV-2 sequencing reads. Run the following:
+Using our configuatrion file as input, we can begin our assembly of SARS-CoV-2 sequencing reads. Run the following (`--data` can be used to specify the location of the data dependencies that SIGNAL uses):
 
 ```
 python signalexe.py --configfile raw_reads_downsampled_config.yaml --cores 4 all postprocess
 ```
 
-We can now start assessing the quality of our assembly. We typically measure the quality of an assembly using three factors:
+We can now start assessing the quality of our assembly. We typically measure the quality of an assembly using a few factors:
 
-- Contiguity: Long contigs are better than short contigs as long contigs give more information about the structure of the genome (for example, the order of genes)
-- Completeness: Most of the genome should be assembled into contigs with few regions missing from the assembly (remember for this exercise we are only assembling one megabase of the genome, not the entire genome)
-- Accuracy: The assembly should have few large-scale _misassemblies_ and _consensus errors_ (mismatches or insertions/deletions)
+- Depth of coverage: The more reads collaborating the base call across the SARS-CoV-2 genome, the more confidence we have in identifying the variant should the base call differ from the reference genmome.
+- Completeness: Most of the genome should be assembled with a large proportion of reads having covered the span of the SARS-CoV-2 genome
+- Accuracy: The assembly should have few failing QC metrics including those for insertions/deletions. Given iVar and Freebayes tools are used for reference assembly and variant calling, we can observe differences between the two methods
 
 ## Additional quality control and assessments using ncov-tools
 
@@ -99,3 +99,5 @@ python signalexe.py --configfile raw_reads_downsampled_config.yaml --cores 4 nco
 ```
 
 ## Interpretation of the data
+
+TBD
