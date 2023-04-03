@@ -112,7 +112,7 @@ We can now start assessing the quality of our assembly. We typically measure the
 Similarly to how our configuatrion file was used as input, we can similarly run `ncov-tools` through SIGNAL. Run the following:
 
 ```
-python signalexe.py --configfile raw_reads_downsampled_config.yaml --cores 4 ncov_tools
+python signalexe.py --configfile cbw_demo_run_config.yaml --cores 4 ncov_tools
 ```
 
 ## Interpretation of the data
